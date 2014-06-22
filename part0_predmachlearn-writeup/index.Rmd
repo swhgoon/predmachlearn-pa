@@ -1,15 +1,11 @@
 ---
 title: "Prediction Assignment Writeup"
 author: "SwhGo_oN"
-date: "06/22/2014"
 output:
   html_document:
     number_sections: yes
     toc: yes
 ---
-
-# Synopsis
-
 
 # Data & PA Info
 

@@ -11,7 +11,6 @@
 
 <meta name="author" content="SwhGo_oN" />
 
-<meta name="date" content="2014-06-22" />
 
 <title>Prediction Assignment Writeup</title>
 
@@ -56,35 +55,30 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <div id="header">
 <h1 class="title">Prediction Assignment Writeup</h1>
 <h4 class="author"><em>SwhGo_oN</em></h4>
-<h4 class="date"><em>06/22/2014</em></h4>
 </div>
 
 <div id="TOC">
 <ul>
-<li><a href="#synopsis"><span class="toc-section-number">1</span> Synopsis</a></li>
-<li><a href="#data-pa-info"><span class="toc-section-number">2</span> Data &amp; PA Info</a><ul>
-<li><a href="#data-source"><span class="toc-section-number">2.1</span> Data Source</a></li>
-<li><a href="#project-goal"><span class="toc-section-number">2.2</span> Project Goal</a></li>
+<li><a href="#data-pa-info"><span class="toc-section-number">1</span> Data &amp; PA Info</a><ul>
+<li><a href="#data-source"><span class="toc-section-number">1.1</span> Data Source</a></li>
+<li><a href="#project-goal"><span class="toc-section-number">1.2</span> Project Goal</a></li>
 </ul></li>
-<li><a href="#data-processing"><span class="toc-section-number">3</span> Data Processing</a><ul>
-<li><a href="#load-libraries"><span class="toc-section-number">3.1</span> Load libraries</a></li>
-<li><a href="#load-data"><span class="toc-section-number">3.2</span> Load Data</a></li>
-<li><a href="#test-data"><span class="toc-section-number">3.3</span> Test Data</a></li>
-<li><a href="#feature-extraction-and-selection"><span class="toc-section-number">3.4</span> Feature extraction and selection</a></li>
-<li><a href="#create-testtraining-partitions"><span class="toc-section-number">3.5</span> Create test/training partitions</a></li>
-<li><a href="#cross-validation"><span class="toc-section-number">3.6</span> Cross-Validation</a></li>
+<li><a href="#data-processing"><span class="toc-section-number">2</span> Data Processing</a><ul>
+<li><a href="#load-libraries"><span class="toc-section-number">2.1</span> Load libraries</a></li>
+<li><a href="#load-data"><span class="toc-section-number">2.2</span> Load Data</a></li>
+<li><a href="#test-data"><span class="toc-section-number">2.3</span> Test Data</a></li>
+<li><a href="#feature-extraction-and-selection"><span class="toc-section-number">2.4</span> Feature extraction and selection</a></li>
+<li><a href="#create-testtraining-partitions"><span class="toc-section-number">2.5</span> Create test/training partitions</a></li>
+<li><a href="#cross-validation"><span class="toc-section-number">2.6</span> Cross-Validation</a></li>
 </ul></li>
-<li><a href="#result"><span class="toc-section-number">4</span> Result</a></li>
+<li><a href="#result"><span class="toc-section-number">3</span> Result</a></li>
 </ul>
 </div>
 
-<div id="synopsis" class="section level1">
-<h1><span class="header-section-number">1</span> Synopsis</h1>
-</div>
 <div id="data-pa-info" class="section level1">
-<h1><span class="header-section-number">2</span> Data &amp; PA Info</h1>
+<h1><span class="header-section-number">1</span> Data &amp; PA Info</h1>
 <div id="data-source" class="section level2">
-<h2><span class="header-section-number">2.1</span> Data Source</h2>
+<h2><span class="header-section-number">1.1</span> Data Source</h2>
 <blockquote>
 <p><strong>Background</strong><br />Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it.</p>
 </blockquote>
@@ -96,7 +90,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 </ul>
 </div>
 <div id="project-goal" class="section level2">
-<h2><span class="header-section-number">2.2</span> Project Goal</h2>
+<h2><span class="header-section-number">1.2</span> Project Goal</h2>
 <ul>
 <li>Use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.</li>
 <li>Predict the manner in which they did the exercise. This is the “classe” variable in the training set.</li>
@@ -104,9 +98,9 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 </div>
 </div>
 <div id="data-processing" class="section level1">
-<h1><span class="header-section-number">3</span> Data Processing</h1>
+<h1><span class="header-section-number">2</span> Data Processing</h1>
 <div id="load-libraries" class="section level2">
-<h2><span class="header-section-number">3.1</span> Load libraries</h2>
+<h2><span class="header-section-number">2.1</span> Load libraries</h2>
 <pre class="r"><code>library(knitr)
 library(caret)
 library(corrplot)
@@ -114,12 +108,12 @@ library(randomForest)
 set.seed(3210)</code></pre>
 </div>
 <div id="load-data" class="section level2">
-<h2><span class="header-section-number">3.2</span> Load Data</h2>
+<h2><span class="header-section-number">2.2</span> Load Data</h2>
 <pre class="r"><code>questionCsv &lt;- read.csv(&quot;pml-testing.csv&quot;)
 trainCsv &lt;- read.csv(&quot;pml-training.csv&quot;, stringsAsFactor=FALSE)</code></pre>
 </div>
 <div id="test-data" class="section level2">
-<h2><span class="header-section-number">3.3</span> Test Data</h2>
+<h2><span class="header-section-number">2.3</span> Test Data</h2>
 <pre class="r"><code># summary(questionCsv)
 # summary(trainCsv)
 sum(complete.cases(questionCsv))</code></pre>
@@ -145,7 +139,7 @@ qplot(roll_arm, pitch_arm, col=classe, data=completeCsv, alpha=0.1)</code></pre>
 </ul>
 </div>
 <div id="feature-extraction-and-selection" class="section level2">
-<h2><span class="header-section-number">3.4</span> Feature extraction and selection</h2>
+<h2><span class="header-section-number">2.4</span> Feature extraction and selection</h2>
 <blockquote>
 <p>In order to identify the most relevant features we used the feature selection algorithm based on correlation proposed by Hall [14]. The algorithm was configured to use a “Best First” strategy based on backtracking. 17 features were selected: in the belt, were selected the mean and variance of the roll, maximum, range and variance of the accelerometer vector, variance of the gyro and variance of the magnetometer. In the arm, the variance of the accelerometer vector and the maximum and minimum of the magnetometer were selected. In the dumbbell, the selected features were the maximum of the acceleration, variance of the gyro and maximum and minimum of the magnetometer, while in the glove, the sum of the pitch and the maximum and minimum of the gyro were selected.</p>
 </blockquote>
@@ -174,13 +168,13 @@ var &lt;- names(trainData)[idx]; var</code></pre>
 trainData$classe &lt;- as.factor(trainCsv$classe)</code></pre>
 </div>
 <div id="create-testtraining-partitions" class="section level2">
-<h2><span class="header-section-number">3.5</span> Create test/training partitions</h2>
+<h2><span class="header-section-number">2.5</span> Create test/training partitions</h2>
 <pre class="r"><code>trainIndex &lt;- createDataPartition(trainData$classe, p = 0.6, list = FALSE)
 training &lt;- trainData[trainIndex, ]
 validation &lt;- trainData[-trainIndex, ]</code></pre>
 </div>
 <div id="cross-validation" class="section level2">
-<h2><span class="header-section-number">3.6</span> Cross-Validation</h2>
+<h2><span class="header-section-number">2.6</span> Cross-Validation</h2>
 <pre class="r"><code>rfit &lt;- randomForest(classe ~ .,data = training, importance = TRUE); rfit</code></pre>
 <pre><code>## 
 ## Call:
@@ -206,7 +200,7 @@ validation &lt;- trainData[-trainIndex, ]</code></pre>
 </div>
 </div>
 <div id="result" class="section level1">
-<h1><span class="header-section-number">4</span> Result</h1>
+<h1><span class="header-section-number">3</span> Result</h1>
 <pre class="r"><code>answers &lt;- predict(rfit, questionCsv[,var]); answers</code></pre>
 <pre><code>##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
 ##  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
