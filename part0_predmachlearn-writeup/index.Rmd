@@ -117,6 +117,11 @@ cv <- confusionMatrix(predict(rfit, validation), validation$classe)
 ```
 The cross-validation accuracy is `r cv$overall[[1]] * 100`%.
 
+```{r cache=TRUE}
+plot(rfit)
+varImpPlot(rfit, cex=0.5)
+```
+
 # Result  
 
 ```{r cache=TRUE}
