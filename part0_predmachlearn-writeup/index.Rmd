@@ -1,0 +1,135 @@
+---
+title: "Prediction Assignment Writeup"
+author: "SwhGo_oN"
+date: "06/22/2014"
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+---
+
+# Synopsis
+
+
+# Data & PA Info
+
+## Data Source
+
+> **Background**  
+> Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it.
+
+The data for this assignment come in the form of two comma-separated-value files:
+
+- The training data : <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv>
+- The test data     : <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv>
+- Source            : <http://groupware.les.inf.puc-rio.br/har>
+
+## Project Goal  
+
+- Use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.
+- Predict the manner in which they did the exercise. This is the "classe" variable in the training set.
+
+# Data Processing  
+
+## Load libraries  
+
+```{r cache=TRUE, results='hide', warning=FALSE, message=FALSE}
+library(knitr)
+library(caret)
+library(corrplot)
+library(randomForest)
+set.seed(3210)
+```
+
+## Load Data  
+
+```{r cache=TRUE}
+questionCsv <- read.csv("pml-testing.csv")
+trainCsv <- read.csv("pml-training.csv", stringsAsFactor=FALSE)
+```
+
+## Test Data
+```{r cache=TRUE}
+# summary(questionCsv)
+# summary(trainCsv)
+sum(complete.cases(questionCsv))
+sum(complete.cases(trainCsv))
+table(trainCsv$classe)
+```
+
+```{r cache=TRUE}
+completeCsv <- trainCsv[complete.cases(trainCsv), ]
+qplot(roll_arm, pitch_arm, col=classe, data=completeCsv, alpha=0.1)
+qplot(roll_arm, pitch_arm, col=classe, data=trainCsv, alpha=0.1)
+pairs(completeCsv[, sample(which(sapply(completeCsv, is.numeric)), 10)])
+```
+
+There are
+
+- Many missing values
+- Few complete cases
+- Some variables/features don't have complete data, or enough predictive power.
+
+## Feature extraction and selection  
+
+> In order to identify the most relevant features we used the feature selection algorithm
+based on correlation proposed by Hall [14]. The algorithm was configured to use
+a “Best First” strategy based on backtracking.
+17 features were selected:
+in the belt, were selected the mean and variance of the roll, maximum,
+range and variance of the accelerometer vector,
+variance of the gyro and variance of the magnetometer.
+In the arm, the variance of the accelerometer vector and the
+maximum and minimum of the magnetometer were selected.
+In the dumbbell, the selected features were the maximum of the acceleration,
+variance of the gyro and maximum and minimum of the magnetometer,
+while in the glove, the sum of the pitch and the maximum and minimum of the gyro were selected.
+
+> > Ref: *Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. Qualitative Activity Recognition of Weight Lifting Exercises. Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human '13) . Stuttgart, Germany: ACM SIGCHI, 2013.* <http://groupware.les.inf.puc-rio.br/public/papers/2013.Velloso.QAR-WLE.pdf>
+
+Here is a simple filter.
+
+```{r cache=TRUE}
+trainData <- trainCsv[sapply(trainCsv, is.numeric)]
+#trainData <- trainData[, - nearZeroVar(trainData)]
+trainData <- trainData[sapply(trainData, function(x) sum(is.na(x)) == 0)]
+c <- cor(trainData, use = "pairwise.complete.obs")
+corrplot(c, order = "hclust", tl.cex = 0.5)
+idx <- findCorrelation(c, 0.75)
+var <- names(trainData)[idx]; var
+trainData <- trainData[,var]
+trainData$classe <- as.factor(trainCsv$classe)
+```
+
+## Create test/training partitions
+
+```{r cache=TRUE}
+trainIndex <- createDataPartition(trainData$classe, p = 0.6, list = FALSE)
+training <- trainData[trainIndex, ]
+validation <- trainData[-trainIndex, ]
+```
+
+## Cross-Validation  
+
+```{r cache=TRUE}
+rfit <- randomForest(classe ~ .,data = training, importance = TRUE); rfit
+cv <- confusionMatrix(predict(rfit, validation), validation$classe)
+```
+The cross-validation accuracy is `r cv$overall[[1]] * 100`%.
+
+# Result  
+
+```{r cache=TRUE}
+answers <- predict(rfit, questionCsv[,var]); answers
+pml_write_files = function(x) {
+    n = length(x)
+    for (i in 1:n) {
+        filename = paste0("problem_id_", i, ".txt")
+        write.table(x[i], file = filename, quote = FALSE, row.names = FALSE, 
+            col.names = FALSE)
+    }
+}
+pml_write_files(answers)
+```
+
+
